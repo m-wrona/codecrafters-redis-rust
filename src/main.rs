@@ -13,9 +13,15 @@ fn main() {
             Ok(mut _stream) => {
                 println!("accepted new connection");
                 let mut buf = [0; 512];
-                _stream.read(&mut buf).unwrap();
-                let response = "+PONG\r\n";
-                _stream.write_all(response.as_bytes()).expect("ping error")
+                loop {
+                    let read=_stream.read(&mut buf).unwrap();
+                    if read == 0 {
+                        println!("connection closed");
+                        break;
+                    }
+                    let response = "+PONG\r\n";
+                    _stream.write_all(response.as_bytes()).expect("ping error")
+                }
             }
             Err(e) => {
                 println!("error: {}", e);
